@@ -23,7 +23,9 @@ Novelty detection은 일반적인 데이터의 경향과는 다른 특이한 혹
 
 <h2> 종류 </h2>
 Novel data에는 크게 세 종류가 있습니다. 
+
 * Global Outlier
+{% include figure.html image="/uploads/feature-image.jpg" caption="Check out my photo" %}
 image1
 
 우리가 보는 일반적인 “outlier”라고 할 수 있습니다. 단순히 일반적인 관측치와 동떨어진 관측치들입니다.
