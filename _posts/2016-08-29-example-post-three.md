@@ -9,8 +9,7 @@ feature_text: |
   The modern pot still is a descendant of the alembic, an earlier distillation device
 feature_image: "https://picsum.photos/2560/600?image=733"
 image: "https://picsum.photos/2560/600?image=733"
-mathjax: true
-
+use_math: true
 ---
 
 A pot still is a type of still used in distilling spirits such as whisky or brandy. Heat is applied directly to the pot containing the wash (for whisky) or wine (for brandy). This is called a batch distillation (as opposed to a continuous distillation).
@@ -20,3 +19,7 @@ At standard atmospheric pressure, alcohol boils at 78 °C (172 °F), while water
 The modern pot still is a descendant of the alembic, an earlier distillation device.
 
 \frac { 3 }{ 4 } 
+
+$$
+K(a,b) = \int \mathcal{D}x(t) \exp(2\pi i S[x]/\hbar)
+$$
