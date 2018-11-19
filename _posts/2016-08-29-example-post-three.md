@@ -85,12 +85,13 @@ $$\Sigma \quad =\quad \frac { 1 }{ n } \sum _{ { x }_{ i }\in { X }^{ + } }^{  }
 
 여기서 X+는 정상 데이터를 의미합니다.
 
-<h2>Maximum likelihood estimation</h2>
+<h3>Maximum likelihood estimation</h3>
 데이터의 각 값들이 나올 확률을 가장 잘 설명하는 분포가 그 데이터의 가우시안 분포라고 할 수 있습니다. 왜냐하면 실제 관측값이 측정될 각각의 확률들을 곱했을 때 최대가 되게끔 하는 분포가 그 데이터의 가우시안 분포이기 때문입니다. 이를 밑의 식으로 표현할 수 있습니다.
 
 $$ L=\prod _{ i=1 }^{ N }{ P({ x }_{ i }|\mu ,{ \sigma  }^{ 2 }) } =\prod _{ i=1 }^{ N }{ \frac { 1 }{ \sqrt { 2\pi  } \sigma  } exp(-\frac { ({ x }_{ i }-\mu )^{ 2 } }{ 2{ \sigma  }^{ 2 } } ) }$$
 
 여기에 로그를 씌우면 밑의 식과 같이 됩니다.
+
 $$\log { L } =-\frac { 1 }{ 2 } \sum _{ i=1 }^{ N }{ \frac { ({ x }_{ i }-\mu )^{ 2 } }{ { \sigma  }^{ 2 } }  } -\frac { N }{ 2 } \log { (2\pi { \sigma  }^{ 2 }) }$$
 
 식을 더 쉽게 표현하기 위해 $\gamma =\frac { 1 }{ { \sigma  }^{ 2 } }$로 바꿔서 표현하면 다음과 같습니다.
@@ -100,6 +101,7 @@ $$ \log { L } =-\frac { 1 }{ 2 } \sum _{ i=1 }^{ N }{ \gamma ({ x }_{ i }-\mu )^
 Log-likelyhood는 아시다시피 위로 볼록한 함수입니다. 이러한 이유 때문에 미지수인 $\mu $와 $\gamma $에 대해 일차 미분을 해서 최적값을 구할 수 있습니다. 
 
 $$\frac { \partial log{ L } }{ \partial \mu  } =\gamma \sum _{ i=1 }^{ N }{ ({ x }_{ i }-\mu ) } =0 \rightarrow \quad \mu =\frac { 1 }{ N } \sum _{ i=1 }^{ N }{ { x }_{ i } }$$
+
 $$\frac { \partial log{ L } }{ \partial \gamma  } =-\frac { 1 }{ 2 } \sum _{ i=1 }^{ N }{ ({ x }_{ i }-\mu )^{ 2 } } +\frac { N }{ 2\gamma  } =0 \rightarrow \quad { \sigma  }^{ 2 }=\frac { 1 }{ N } \sum _{ i=1 }^{ N }{ { (x }_{ i }-\mu )^{ 2 } }
 $$
 
