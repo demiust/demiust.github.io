@@ -1,7 +1,7 @@
 ---
 title: Density-based novelty detection
 categories: 
-- Novelty Detection
+- General
 excerpt: |
   Density-based novelty detection (Gaussian Density Estimation, Mixture of Gaussian, Kernel Density Estimation, LOF)
 feature_text: |
