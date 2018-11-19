@@ -59,6 +59,137 @@ normal data를 novel data로 분류한 경우의 에러는 False Rejection Rate(
 {% include figure.html image="/images/image6.png"%}
 FRR과 FAR을 두 축으로 해서 FRR이 FAR과 같아질 때를 Equal error rate(EER)이라고 하고, FRR-FAR curve의 밑부분의 면적을 Integrated Error(IE)라고 합니다. Novelty detection 알고리즘은 EER과 IE가 낮을수록 좋다고 평가할 수 있습니다.
 
+<h2> Density-based Novelty Detection </h2> 
+
+Density-based 방식은 기존에 가지고 있는 정상 데이터의 분포를 사용하여 outlier를 찾아내는 방식입니다. 기존에 있는 데이터를 사용하여 알고리즘을 학습하기 때문에 supervised learning이라고 할 수 있습니다.
+
+(그림7)
+위 그림에서 보시다시피, 우리가 갖고 있는 정상 데이터 분포가 있을 경우에 빨간색 데이터가 들어온다면 이는 outlier라고 할 수 있습니다. 이렇듯 정상 데이터만을 사용하여 추정한 분포를 가지고 이상치를 탐지할 수 있습니다.
+
+앞으로 설명할 밀도 기반 이상치 탐지 기법은 총 4개입니다.<br>
+* Gaussian Density Estiation
+* Mixture of Gaussian Density Estimation
+* Kernel-density Estimation
+* Local Outlier Factors (LOF)
+
+<h2> Gaussian Density Estimation </h2>
+가우시안 밀도 추정 방법은 우리가 가진 정상 데이터의 분포가 기본적으로 가우시안 분포(정규 분포)를 따른다고 가정하는 방법입니다. 
+
+image8
+$$p(x)\quad =\quad \frac { 1 }{ { 2\pi  }^{ { d }/{ 2 } }{ \Sigma  }^{ { 1 }/{ 2 } } } exp\left[ \frac { 1 }{ 2 } { (x-\mu ) }^{ T }{ \Sigma  }^{ -1 }(x-\mu ) \right]$$
+
+이 식은 우리가 익히 보아온 가우시안 분포를 표현한 식입니다. 여기서 각각 mu와 sigma는 아래의 식과 같습니다.
+
+$$\mu \quad =\quad \frac { 1 }{ n } \sum _{ { x }_{ i }\in { X }^{ + } }^{  }{ { x }_{ i } } \quad (mean\quad vector)$$
+$$\Sigma \quad =\quad \frac { 1 }{ n } \sum _{ { x }_{ i }\in { X }^{ + } }^{  }{ ({ x }_{ i }-\mu ){ ({ x }_{ i }-\mu ) }^{ T } } \quad (covariance\quad matrix)$$
+
+여기서 X+는 정상 데이터를 의미합니다.
+
+<h2>Maximum likelihood estimation</h2>
+데이터의 각 값들이 나올 확률을 가장 잘 설명하는 분포가 그 데이터의 가우시안 분포라고 할 수 있습니다. 왜냐하면 실제 관측값이 측정될 각각의 확률들을 곱했을 때 최대가 되게끔 하는 분포가 그 데이터의 가우시안 분포이기 때문입니다. 이를 밑의 식으로 표현할 수 있습니다.
+
+$$ L=\prod _{ i=1 }^{ N }{ P({ x }_{ i }|\mu ,{ \sigma  }^{ 2 }) } =\prod _{ i=1 }^{ N }{ \frac { 1 }{ \sqrt { 2\pi  } \sigma  } exp(-\frac { ({ x }_{ i }-\mu )^{ 2 } }{ 2{ \sigma  }^{ 2 } } ) }$$
+
+여기에 로그를 씌우면 밑의 식과 같이 됩니다.
+$$\log { L } =-\frac { 1 }{ 2 } \sum _{ i=1 }^{ N }{ \frac { ({ x }_{ i }-\mu )^{ 2 } }{ { \sigma  }^{ 2 } }  } -\frac { N }{ 2 } \log { (2\pi { \sigma  }^{ 2 }) }$$
+
+식을 더 쉽게 표현하기 위해 $\gamma =\frac { 1 }{ { \sigma  }^{ 2 } }$로 바꿔서 표현하면 다음과 같습니다.
+
+$$ \log { L } =-\frac { 1 }{ 2 } \sum _{ i=1 }^{ N }{ \gamma ({ x }_{ i }-\mu )^{ 2 } } -\frac { N }{ 2 } \log { (2\pi ) } +\frac { N }{ 2 } log(\gamma )$$
+
+Log-likelyhood는 아시다시피 위로 볼록한 함수입니다. 이러한 이유 때문에 미지수인 $\mu $와 $\gamma $에 대해 일차 미분을 해서 최적값을 구할 수 있습니다. 
+
+$$\frac { \partial log{ L } }{ \partial \mu  } =\gamma \sum _{ i=1 }^{ N }{ ({ x }_{ i }-\mu ) } =0 \rightarrow \quad \mu =\frac { 1 }{ N } \sum _{ i=1 }^{ N }{ { x }_{ i } }$$
+$$\frac { \partial log{ L } }{ \partial \gamma  } =-\frac { 1 }{ 2 } \sum _{ i=1 }^{ N }{ ({ x }_{ i }-\mu )^{ 2 } } +\frac { N }{ 2\gamma  } =0 \rightarrow \quad { \sigma  }^{ 2 }=\frac { 1 }{ N } \sum _{ i=1 }^{ N }{ { (x }_{ i }-\mu )^{ 2 } }
+$$
+
+위의 식을 통해서 우리가 가진 데이터의 평균과 분산이 정규분포의 평균과 분산과 같아지는 것을 확인할 수 있었습니다.
+
+class Gaussian:
+    def __init__(self, mu, sigma):
+        self.mu = mu
+        self.sigma = sigma
+
+    def pdf(self, data): # 가우시안 분포 pdf 값 return
+        u = (data - self.mu) / abs(self.sigma)
+        y = (1 / (sqrt(2 * pi) * abs(self.sigma))) * exp(-u * u / 2)
+        return y
+
+# 가우시안 분포 그리기
+x = np.linspace(3,9,200)
+g_single = stats.norm(best.mu, best.sigma).pdf(x)
+sns.distplot(y, bins=20, kde = False, norm_hist= True)
+plt.plot(x,g_single, label = 'Single Gaussian')
+plt.legend()
+
+print(y[0:5])
+
+#정상 boundary 외 outlier filtering
+n = 0
+b=0
+for i in range(0,y.shape[0]):
+    if (stats.norm(best.mu, best.sigma).pdf(y[i])) >0.05 and (stats.norm(best.mu, best.sigma).pdf(y[i])) < 0.995:
+        print(y[i],"= normal")
+        n=n+1
+    else:
+        print(y[i],"=abnormal")
+        b=b+1
+
+print("normal=",n)
+print(“abnormal=",b)
+
+코드 설명
+
+—
+Spherical type
+그림
+
+Diagonal type
+그림
+
+Full type
+그림
+
+2. - Mixture of Gaussian
+그림
+
+위에서는 하나의 가우시안 분포로 전체 데이터를 설명하고자 했다면, 
+혼합 가우시안 분포는 여러개의 가우시안 분포의 조합으로 데이터를 추정하고자 하는 것입니다.
+
+data가 normal data일 확률은 이렇습니다.
+
+(식)
+
+(파라미터 설명)
+
+
+EM algorithm
+
+혼합 가우시안 모델은 Expectation, Maximization 과정을 통해 최적값을 찾아나가야 합니다. 
+
+E step은 (식)
+
+M-step은 (식)
+
+-코드 (이것은 scikil-learn 등의 하이레벨 써도 될듯) _ https://scikit-learn.org/stable/auto_examples/mixture/plot_gmm_covariances.html 참고
+
+3. - Kernel Density 
+
+커널 밀도 추정은 데이터가 가우시안 분포와 같은 특정 분포를 따르지 않는다고 가정하는 방법입니다. 
+
+Parzen
+설명만 하고
+코드는 간단하게만 제시하기 (high-level)
+
+5. - LOF
+
+설명
+
+
+코드
+
+
+
 
 $ \frac { 3 }{ 4 } $
 
