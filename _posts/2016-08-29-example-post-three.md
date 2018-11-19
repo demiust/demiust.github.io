@@ -25,12 +25,12 @@ Novelty detection은 일반적인 데이터의 경향과는 다른 특이한 혹
 Novel data에는 크게 세 종류가 있습니다. 
 <br>
 * Global Outlier
-{% include figure.html image="/images/image1.png"%}
+{% include figure.html image="/images/image1.png" width="300"%}
 
 우리가 보는 일반적인 “outlier”라고 할 수 있습니다. 단순히 일반적인 관측치와 동떨어진 관측치들입니다.
 
 * Contextual outlier(local outlier)
-{% include figure.html image="/images/image2.png"%}
+{% include figure.html image="/images/image2.png" width="300"%}
 
 특정 상황 혹은 맥락 정보를 고려해 “outlier”가 되는 경우입니다. 예를 들면, 알래스카의 영상 30도는 outlier라고 볼 수 있지만, 사하라 사막의 영상 30도는 outlier가 아닐 수 있습니다.
 
@@ -76,11 +76,13 @@ Density-based 방식은 기존에 가지고 있는 정상 데이터의 분포를
 가우시안 밀도 추정 방법은 우리가 가진 정상 데이터의 분포가 기본적으로 가우시안 분포(정규 분포)를 따른다고 가정하는 방법입니다. 
 
 image8
+
 $$p(x)\quad =\quad \frac { 1 }{ { 2\pi  }^{ { d }/{ 2 } }{ \Sigma  }^{ { 1 }/{ 2 } } } exp\left[ \frac { 1 }{ 2 } { (x-\mu ) }^{ T }{ \Sigma  }^{ -1 }(x-\mu ) \right]$$
 
 이 식은 우리가 익히 보아온 가우시안 분포를 표현한 식입니다. 여기서 각각 mu와 sigma는 아래의 식과 같습니다.
 
 $$\mu \quad =\quad \frac { 1 }{ n } \sum _{ { x }_{ i }\in { X }^{ + } }^{  }{ { x }_{ i } } \quad (mean\quad vector)$$
+
 $$\Sigma \quad =\quad \frac { 1 }{ n } \sum _{ { x }_{ i }\in { X }^{ + } }^{  }{ ({ x }_{ i }-\mu ){ ({ x }_{ i }-\mu ) }^{ T } } \quad (covariance\quad matrix)$$
 
 여기서 X+는 정상 데이터를 의미합니다.
@@ -107,6 +109,7 @@ $$
 
 위의 식을 통해서 우리가 가진 데이터의 평균과 분산이 정규분포의 평균과 분산과 같아지는 것을 확인할 수 있었습니다.
 
+```python
 class Gaussian:
     def __init__(self, mu, sigma):
         self.mu = mu
@@ -116,7 +119,7 @@ class Gaussian:
         u = (data - self.mu) / abs(self.sigma)
         y = (1 / (sqrt(2 * pi) * abs(self.sigma))) * exp(-u * u / 2)
         return y
-
+```
 # 가우시안 분포 그리기
 x = np.linspace(3,9,200)
 g_single = stats.norm(best.mu, best.sigma).pdf(x)
