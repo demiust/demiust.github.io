@@ -18,7 +18,7 @@ At standard atmospheric pressure, alcohol boils at 78 °C (172 °F), while water
 
 The modern pot still is a descendant of the alembic, an earlier distillation device.
 
-\frac { 3 }{ 4 } 
+$ \frac { 3 }{ 4 } $
 
 $$
 K(a,b) = \int \mathcal{D}x(t) \exp(2\pi i S[x]/\hbar)
