@@ -21,12 +21,11 @@ Novelty detection은 일반적인 데이터의 경향과는 다른 특이한 혹
 
 위에서 정의된 것처럼 novel data(outliers)는 일반적인 데이터와 차이가 많이 나는 관측 데이터라고 볼 수 있습니다. 여기서 재밌는 점은 novel data는 __noise data와 다르다__ 는 점입니다. Noise는 데이터 전처리 과정에서 제거해줘야 할 데이터이기 때문에 novelty detection 이전에 제거하게 됩니다. 하지만 novel data는 일반적인 데이터를 만들어낸 메커니즘을 위반하는 특이한 케이스의 관측치들이기 때문에 novelty detection에서 찾아내고자 하는 관측치입니다.
 
-<h2> 종류 </h2>
+<h3> Novel data의 종류 </h3>
 Novel data에는 크게 세 종류가 있습니다. 
-
+<br>
 * Global Outlier
-{% include figure.html image="/uploads/feature-image.jpg" caption="Check out my photo" %}
-image1
+{% include figure.html image="/uploads/image1.jpg"%}
 
 우리가 보는 일반적인 “outlier”라고 할 수 있습니다. 단순히 일반적인 관측치와 동떨어진 관측치들입니다.
 
