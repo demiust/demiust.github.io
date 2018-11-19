@@ -30,7 +30,7 @@ Novel data에는 크게 세 종류가 있습니다.
 우리가 보는 일반적인 “outlier”라고 할 수 있습니다. 단순히 일반적인 관측치와 동떨어진 관측치들입니다.
 
 * Contextual outlier(local outlier)
-image2
+{% include figure.html image="/images/image2.png"%}
 
 특정 상황 혹은 맥락 정보를 고려해 “outlier”가 되는 경우입니다. 예를 들면, 알래스카의 영상 30도는 outlier라고 볼 수 있지만, 사하라 사막의 영상 30도는 outlier가 아닐 수 있습니다.
 
@@ -41,7 +41,7 @@ image2
 <h3> Classification과의 차이 </h3>
 Novelty Detection은 Classification과 차이가 있습니다. 
 
-image3 
+{% include figure.html image="/images/image3.png"%}
 왼쪽의 그림에서처럼 Classification은 X와 O를 각각 X의 경우에는 “빨간색”의 범주로, O의 경우에는 “파란색”의 범주로 학습시킵니다. 즉, 각각의 범주를 학습시킵니다.
 반면 오른쪽의 그림에서처럼 Novelty detection은 파란색만 데이터로 활용해 훈련해서, 결과적으로 파란색(정상) 범주에 포함되는지 포함되지 않는지만을 알아내는 것이 목적입니다.
 
@@ -50,13 +50,13 @@ Class Imbalance가 크고, minority class example의 개수가 충분하지 않�
 <h3> Performance measure </h3>
 Novelty detection 알고리즘의 평가는 다음과 같이 합니다.
 
-image4
+{% include figure.html image="/images/image4.png"%}
 우선 normal data를 novel data로 분류한 경우와, novel data를 normal data로 분류한 경우가 적을 수록 이상한 데이터를 잘 가려내었다고 판단할 수 있습니다.
 
-image5
+{% include figure.html image="/images/image5.png"%}
 normal data를 novel data로 분류한 경우의 에러는 False Rejection Rate(FRR)로 표현할 수 있고, novel data를 normal data로 분류한 경우의 에러는 False Acceptance Rate (FAR)로 표현할 수 있습니다.
 
-image6
+{% include figure.html image="/images/image6.png"%}
 FRR과 FAR을 두 축으로 해서 FRR이 FAR과 같아질 때를 Equal error rate(EER)이라고 하고, FRR-FAR curve의 밑부분의 면적을 Integrated Error(IE)라고 합니다. Novelty detection 알고리즘은 EER과 IE가 낮을수록 좋다고 평가할 수 있습니다.
 
 
