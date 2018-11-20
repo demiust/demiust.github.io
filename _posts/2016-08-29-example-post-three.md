@@ -120,65 +120,84 @@ class Gaussian:
         y = (1 / (sqrt(2 * pi) * abs(self.sigma))) * exp(-u * u / 2)
         return y
 ```
-# 가우시안 분포 그리기
-x = np.linspace(3,9,200)
-g_single = stats.norm(best.mu, best.sigma).pdf(x)
-sns.distplot(y, bins=20, kde = False, norm_hist= True)
-plt.plot(x,g_single, label = 'Single Gaussian')
-plt.legend()
-
-print(y[0:5])
-
-#정상 boundary 외 outlier filtering
-n = 0
-b=0
-for i in range(0,y.shape[0]):
-    if (stats.norm(best.mu, best.sigma).pdf(y[i])) >0.05 and (stats.norm(best.mu, best.sigma).pdf(y[i])) < 0.995:
-        print(y[i],"= normal")
-        n=n+1
-    else:
-        print(y[i],"=abnormal")
-        b=b+1
-
-print("normal=",n)
-print(“abnormal=",b)
 
 코드 설명
 
-—
-Spherical type
-그림
+가우시안 분포는 Covariance matrix type에 따라 모양이 변합니다. 
+* Spherical type
 
-Diagonal type
-그림
+$$% <![CDATA[
+{ \sigma  }^{ 2 }=\frac { 1 }{ d } \sum _{ i=1 }^{ d }{ { \sigma  }^{ 2 } } ,\quad \sum  ={ \sigma  }^{ 2 }\left[ \begin{matrix} 1 & \cdots  & 0 \\ \vdots  & \ddots  & \vdots  \\ 0 & \cdots  & 1 \end{matrix} \right] %]]>
+$$
 
-Full type
-그림
+image9
 
-2. - Mixture of Gaussian
-그림
+covariance matrix가 diagonal이고 동시에 x1과 x2의 각 축에서 분산이 같다고 단순하게 가정했을 때의 가우시안 분포는 위에서 봤을 때 원모양의 등고선을 보여줍니다. 
 
-위에서는 하나의 가우시안 분포로 전체 데이터를 설명하고자 했다면, 
-혼합 가우시안 분포는 여러개의 가우시안 분포의 조합으로 데이터를 추정하고자 하는 것입니다.
+* Diagonal type
 
-data가 normal data일 확률은 이렇습니다.
+$$% <![CDATA[
+\sum  =\left[ \begin{matrix} { { \sigma  } }_{ 1 }^{ 2 } & \cdots  & 0 \\ \vdots  & \ddots  & \vdots  \\ 0 & \cdots  & { { \sigma  } }_{ d }^{ 2 } \end{matrix} \right] %]]>
+$$
 
-(식)
+image10
 
-(파라미터 설명)
+covariance matrix가 diagonal이긴 하지만 축마다 분산이 다르다고 가정한 경우의 가우시안 분포는 위에서 봤을 때 축이 어그러지지 않은 타원형의 등고선을 보여줍니다.
 
+* Full type
 
-EM algorithm
+$$% <![CDATA[
+\sum  =\left[ \begin{matrix} { \sigma  }_{ 11 } & \cdots  & { \sigma  }_{ 1d } \\ \vdots  & \ddots  & \vdots  \\ { \sigma  }_{ d1 } & \cdots  & { \sigma  }_{ dd } \end{matrix} \right] %]]>
+$$
 
-혼합 가우시안 모델은 Expectation, Maximization 과정을 통해 최적값을 찾아나가야 합니다. 
+image11
 
-E step은 (식)
+full covariance matrix를 가질 때를 가정하면 가우시안 분포가 축도 어그러진 타원형의 등고선을 보이고 있습니다.
 
-M-step은 (식)
+<h2> Mixture of Gaussian </h2>
 
--코드 (이것은 scikil-learn 등의 하이레벨 써도 될듯) _ https://scikit-learn.org/stable/auto_examples/mixture/plot_gmm_covariances.html 참고
+위에서 본 Gaussian Density Estimation은 데이터의 분포가 가우시안 분포를 따른다는 강한 가정을 하고 있기 때문에, 복잡한 데이터의 분포의 경우는 잘 표현하지 못할 수 있습니다. 이런 이유 때문에 여러개의 가우시안 분포의 결합으로 데이터 분포를 나타내고자 하는 알고리즘이 바로 Mixture of Gaussian(혼합 가우시안) 알고리즘이라고 할 수 있습니다.
 
-3. - Kernel Density 
+image12
+
+혼합 가우시안 분포에서 데이터가 normal일 확률은 다음과 같습니다.
+
+$$p(x|\lambda )=\sum _{ m=1 }^{ M }{ { w }_{ m }g(x|{ \mu  }_{ m },{\sum} _{ m }  } )$$
+
+이 때 g와 lamda는 다음과 같습니다. 
+
+$$g(x|{ \mu  }_{ m },{ \sum   }_{ m })=\frac { 1 }{ { (2\pi ) }^{ d/2 }{ |{ \sum   }_{ m }| }^{ 1/2 } } exp[\frac { 1 }{ 2 } (x-{ \mu  }_{ m })^{ T }{ { \sum   } }_{ m }^{ -1 }(x-{ \mu  }_{ m })] $$
+
+$$\lambda =\left\{ { w }_{ m },{ \mu  }_{ m },{ \sum   }_{ m } \right\} ,m=1,\cdots ,M$$
+
+즉 M개의 가우시안 분포를 가정하고 있고, 각각의 가우시안 분포에 가중치를 주어서 전체 분포를 추정하고 있습니다. 
+ 
+<h3>Expectation-Maximization Algorithm</h3>
+
+혼합 가우시안 모델을 쓰기 위해서는 Expectation-Maximization Algorithm을 사용해야 합니다. 이 때, Expectation은 ${ w }_{ m }$, ${ \mu  }_{ m }$, ${ \Sigma  }_{ m }$ 를 고정시킨 상태에서 m을 찾는 과정입니다. 이 때, m은 개별 개체가 몇 번 분포에 얼마만큼 들어갈 확률인지를 말합니다.
+
+$$ p(m|{ x }_{ i },\lambda )=\frac { { w }_{ m }g({ x }_{ t }|{ \mu  }_{ m },{ m }_{ m }) }{ \sum _{ k=1 }^{ M }{ { w }_{ k }g({ x }_{ i }|{ \mu  }_{ k },{ m }_{ k }) }  }
+$$
+
+Maximization은 m을 고정한 상황에서 ${ w }_{ m }$, ${ \mu  }_{ m }$, ${ \Sigma  }_{ m }$ 를 최적화하는 과정입니다.
+
+$${ w }_{ m }^{ (new) }=\frac { 1 }{ N } \sum _{ i=1 }^{ N }{ p(m|{ x }_{ i },\lambda ) }$$
+
+$${ \mu  }_{ m }^{ (new) }=\frac { p(m|{ x }_{ i },\lambda ){ x }_{ i } }{ \sum _{ i=1 }^{ N }{ p(m|{ x }_{ i },\lambda ) }  }$$
+
+$${ \sigma  }_{ m }^{ 2(new) }=\frac { \sum _{ i=1 }^{ N }{ p(m|{ x }_{ i },\lambda ){ x }_{ i }^{ 2 } }  }{ \sum _{ i=1 }^{ N }{ p(m|{ x }_{ i },\lambda ) }  } -{ \mu  }_{ m }^{ 2(new) }
+$$
+
+EM 알고리즘은 이 두 과정을 계속적으로 반복해 나가면서 데이터의 분포를 추정하고자 합니다.
+
+혼합 가우시안 분포도 역시 어떻게 Covariance matrix type을 가정하느냐에 따라 모양이 변합니다. 
+
+image13
+
+-코드 
+https://scikit-learn.org/stable/auto_examples/mixture/plot_gmm_covariances.html 참고
+
+<h2>Kernel Density Estimation</h2>
 
 커널 밀도 추정은 데이터가 가우시안 분포와 같은 특정 분포를 따르지 않는다고 가정하는 방법입니다. 
 
@@ -186,18 +205,8 @@ Parzen
 설명만 하고
 코드는 간단하게만 제시하기 (high-level)
 
-5. - LOF
+<h2>LOF</h2>
 
 설명
 
 
-코드
-
-
-
-
-$ \frac { 3 }{ 4 } $
-
-$$
-K(a,b) = \int \mathcal{D}x(t) \exp(2\pi i S[x]/\hbar)
-$$
