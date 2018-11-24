@@ -199,14 +199,100 @@ https://scikit-learn.org/stable/auto_examples/mixture/plot_gmm_covariances.html 
 
 <h2>Kernel Density Estimation</h2>
 
-커널 밀도 추정은 데이터가 가우시안 분포와 같은 특정 분포를 따르지 않는다고 가정하는 방법입니다. 
+커널 밀도 추정은 데이터가 가우시안 분포와 같은 특정 분포를 따르지 않는다고 가정합니다. 즉, 데이터 자체에서 바로 밀도 추정을 하고자 시도하는 방법입니다. 
 
-Parzen
-설명만 하고
-코드는 간단하게만 제시하기 (high-level)
+p(x)(임의의 확률 밀도 함수)의 분포에서 벡터 x가 표본 공간에 주어진 R 범위에 있을 확률은 밑 식처럼 나타낼 수 있습니다.
 
-<h2>LOF</h2>
+$$P=\int _{ R }^{  }{ p({ x }^{ \prime  })dx^{ \prime  } }$$
 
-설명
+N 개의 벡터 ${ { x }^{ 1 },{ x }^{ 2 },… ,{ x }^{ n }}$ 가 p(x)의 분포에서 추출된 벡터들이라고 생각해봅시다. 이 N개의 벡터들 중 k개의 벡터가 R에 들어갈 확률은 다음과 같습니다. 
+
+$$P(k)=\left( \begin{matrix} N \\ k \end{matrix} \right) { P }^{ k }(1-P)^{ N-k }$$
+
+이는 이항분포이므로, k/N의 평균과 분산 값을 다음과 같이 찾을 수 있습니다.
+
+$$E(k)=NP\rightarrow E\left[ \frac { k }{ N }  \right] =P$$
+
+$$Var(k)=NP(1-P)\rightarrow Var\left[ \frac { k }{ N }  \right] =\frac { P(1-P) }{ N }$$
+
+이 식에서 N이 무한대로 가면, 분산은 0에 가까워지게 되고 결국 $P\cong \frac { k }{ N }$ 식이 성립될 것입니다.
+
+R이 만약 엄청 작아지게 된다면 $P=\int _{ R }^{  }{ P({ x }^{ \prime  })d{ x }^{ \prime  } } \cong p(x)V=\frac { k }{ N } ,\quad p(x)=\frac { k }{ NV }$ 의 식이 성립하게 됩니다.
+
+이 식에서 우리가 가져야 하는 조건은 첫번째로, R이 충분히 작아야 한다는 것과, 두번째로, 그럼에도 불구하고 N개 벡터 중 K개가 R에 들어갈 정도로는 커야한다는 것입니다. 
+이를 V를 고정시키고 k를 결정하는 문제로 본 것이 Kernel-density Estimation입니다.
+
+image14
+
+k개의 샘플을 갖고 있는 hypercube의 영역 R이 있다고 가정해봅시다. 이 hypercube 의 한 변의 길이를 h라고 하고, 이 hypercube의 정 중앙을 x라고 합시다. 이 때, 차원이 d라면 이 영역의 부피는 ${ V }_{ n }={ h }_{ n }^{ d }$ 입니다. 
+
+만약 이 큐브 안에 샘플 개수를 세는 식을 만든다면, 밑 식과 같습니다.
+
+$$% <![CDATA[
+K({ u })=\left\{ \begin{array}{lll} 1, & |u_{ i }|\le 1/2, & i=1,...,D \\ 0, & otherwise & \;  \end{array} \right. \qquad %]]>
+$$
+
+$$k=\sum _{ i=1 }^{ N }{ K(\frac { { x }^{ i }-x }{ h } ) }$$
+
+이 식은 결국 x를 기준으로 각 차원에서 h/2 거리 안에 있는 모든 샘플의 개수를 세고 있는 식입니다.
+위와 같은 함수를 Kernel Function(커널 함수)라고 합니다. (이 경우엔 Parzen window(파젠 윈도우)를 예시로 한 것입니다.)
+
+Parzen 윈도우를 통해 데이터의 밀도를 추정한 함수는 다음과 같습니다.
+
+$$p(x)=\frac { 1 }{ N{ h }^{ d } } \sum _{ i=1 }^{ N }{ K(\frac { { x }^{ i }-x }{ h } ) }$$
+
+지금 이 경우는 파젠 윈도우를 사용한 것이지만, 파젠 윈도우는 영역 안은 무조건 1 값을, 영역 밖이면 무조건 0 값을 주고 있기 때문에 밀도 표현이 불연속적이게 됩니다. 
+이러한 이유 때문에 다양한 방식의 다른 커널을 사용하기 합니다.
+
+대표적으로 가우시안 커널을 사용하는 경우에는 밑의 식처럼 표현할 수 있습니다. 
+
+$$p({\bf x}) = \frac{1}{N}\sum_{n=1}^N\frac{1}{(2\pi h^2)^{D/2}}\exp\left\{-\frac{\|{\bf x}-{\bf x}_n\|^2}{2h^2}\right\}
+$$
+
+또한 h값에 따라 추정하느 분포의 모양이 달라지는데요, h가 큰 값일 경우 완만한 분포가 추정되고, h가 작은 값일 경우에는 뾰족뾰족한 분포가 됩니다.
+
+image15
+
+-코드-
+
+<h2>Local Oultlier Factors</h2>
+
+Local Outlier Factors(LOF)는 데이터가 가지는 상대적인 밀도까지 고려한 이상치 탐지 방법입니다.
+
+LOF에서는 k-distance라는 개념을 사용합니다. k-distance(p)란 A 데이터로부터 k번째로 가장 가까운 데이터까지의 거리를 뜻합니다. 그리고 그 때 k-distance 범위 내에 들어오는 데이터의 집합을 ${N}_{k}(p)$ 라고 합니다.
+
+LOF에서는 reachability distance라는 것도 정의해야 합니다.
+
+$${ reachability-distance }_{ k }(p,o)=max\left\{ k-distance(o),dist(p,o) \right\}$$
+
+reachability distance는 단순하게 말하자면, k-distance 범위 안에 있는 데이터까지의 거리는 p와 o 사이의 거리와 k-distance 중 큰 값을 사용하자는 것입니다. 
+
+image16
+
+위에서 보면 A에서 C까지의 거리를 rechability distance로 바꾸어서 거리를 계산하게 되면 3-distance(A)와 같아집니다.
+D의 경우는 rechability distance보다 멀리 있기 때문에 그대로 거리값을 사용하게 됩니다.
+
+Local reachability distance는 다음과 같이 정의합니다. 
+
+$$lrd_{ k }(A)=\frac { |{ N }_{ k }(p)| }{ \sum _{ O\in { N }_{ k }(p) } reachability-distance_{ k }(p,o) }$$
+
+분자는 k-distance 안의 개체 수이고, 분모는 p에서 다른 오브젝트까지의 reachability distance입니다. 
+
+p가 밀도가 높은 부분에 위치한다면 분모는 작아지게 되고, 그러면 ${lrd}_{k}(p)$ 값은 커집니다.
+반대로 p가 밀도가 낮은 부분에 위치한다면 분모는 커지고, 그러면 ${lrd}_{k}(p)$ 값은 작아집니다.
+
+<h3>Local outlier factor</h3>
+
+$${ LOF }_{ k }(p)=\frac { \sum _{ o\in { N }_{ k }(p) }^{  }{ \frac { lrd_{ k }(o) }{ lrd_{ k }(p) }  }  }{ |{ N }_{ k }(p)| } =\frac { \frac { 1 }{ lrd_{ k }(p) } \sum _{ o\in { N }_{ k }(p) }^{  }{ lrd_{ k }(o) }  }{ |{ N }_{ k }(p)| }$$
+
+LOF 점수는 위의 식처럼 구할 수 있습니다. 여기서 LOF의 점수는 p가 얼마나 이상치인지를 나타내주는 점수라고 할 수 있습니다.
+
+Image17
+
+위 그림에서 파란색 점이 p이고 초록색 점이 q라고 합시다.
+LOF(p) 값이 크려면 ‘초록색 점들이 밀도가 높은 와중에 파란색 점은 밀도가 낮아야’ 합니다.
+지금 Case 2번의 경우만 이런 조건을 만족시키기 때문에 LOF(p)가 높고, 나머지 케이스들은 LOF(p)가 낮습니다.
+
+즉, 단순히 파란색 점 주변의 상대적 밀도뿐만 아니라 초록색 점 주변의 상대적 밀도들도 같이 고려해주는 알고리즘입니다.
 
 
