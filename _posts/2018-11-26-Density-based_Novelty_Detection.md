@@ -206,14 +206,18 @@ $$\lambda =\left\{ { w }_{ m },{ \mu  }_{ m },{ \sum   }_{ m } \right\} ,m=1,\cd
 
 혼합 가우시안 모델을 쓰기 위해서는 Expectation-Maximization Algorithm을 사용해야 합니다. 이 때, Expectation은 
 
-${ w }_{ m } , { \mu  }_{ m } , { \Sigma  }_{ m }$ 
+$${ w }_{ m } , { \mu  }_{ m } , { \Sigma  }_{ m }$$
 
 를 고정시킨 상태에서 m을 찾는 과정입니다. 이 때, m은 개별 개체가 몇 번 분포에 얼마만큼 들어갈 확률인지를 말합니다.
 
 $$ p(m|{ x }_{ i },\lambda )=\frac { { w }_{ m }g({ x }_{ t }|{ \mu  }_{ m },{ m }_{ m }) }{ \sum _{ k=1 }^{ M }{ { w }_{ k }g({ x }_{ i }|{ \mu  }_{ k },{ m }_{ k }) }  }
 $$
 
-Maximization은 m을 고정한 상황에서 ${ w }_{ m }$, ${ \mu  }_{ m }$, ${ \Sigma  }_{ m }$ 를 최적화하는 과정입니다.
+Maximization은 m을 고정한 상황에서 
+
+$${ w }_{ m }$, ${ \mu  }_{ m }$, ${ \Sigma  }_{ m }$$ 
+
+를 최적화하는 과정입니다.
 
 $${ w }_{ m }^{ (new) }=\frac { 1 }{ N } \sum _{ i=1 }^{ N }{ p(m|{ x }_{ i },\lambda ) }$$
 
