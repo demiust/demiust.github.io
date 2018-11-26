@@ -63,7 +63,7 @@ FRR과 FAR을 두 축으로 해서 FRR이 FAR과 같아질 때를 Equal error ra
 
 Density-based 방식은 기존에 가지고 있는 정상 데이터의 분포를 사용하여 outlier를 찾아내는 방식입니다. 기존에 있는 데이터를 사용하여 알고리즘을 학습하기 때문에 supervised learning이라고 할 수 있습니다.
 
-(그림7)
+{% include figure.html image="/images/image7.png"%}
 위 그림에서 보시다시피, 우리가 갖고 있는 정상 데이터 분포가 있을 경우에 빨간색 데이터가 들어온다면 이는 outlier라고 할 수 있습니다. 이렇듯 정상 데이터만을 사용하여 추정한 분포를 가지고 이상치를 탐지할 수 있습니다.
 
 앞으로 설명할 밀도 기반 이상치 탐지 기법은 총 4개입니다.<br>
@@ -75,7 +75,7 @@ Density-based 방식은 기존에 가지고 있는 정상 데이터의 분포를
 <h2> Gaussian Density Estimation </h2>
 가우시안 밀도 추정 방법은 우리가 가진 정상 데이터의 분포가 기본적으로 가우시안 분포(정규 분포)를 따른다고 가정하는 방법입니다. 
 
-image8
+{% include figure.html image="/images/image8.png"%}
 
 $$p(x)\quad =\quad \frac { 1 }{ { 2\pi  }^{ { d }/{ 2 } }{ \Sigma  }^{ { 1 }/{ 2 } } } exp\left[ \frac { 1 }{ 2 } { (x-\mu ) }^{ T }{ \Sigma  }^{ -1 }(x-\mu ) \right]$$
 
@@ -110,18 +110,46 @@ $$
 위의 식을 통해서 우리가 가진 데이터의 평균과 분산이 정규분포의 평균과 분산과 같아지는 것을 확인할 수 있었습니다.
 
 ```python
-class Gaussian:
-    def __init__(self, mu, sigma):
-        self.mu = mu
-        self.sigma = sigma
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
+import math
 
-    def pdf(self, data): # 가우시안 분포 pdf 값 return
-        u = (data - self.mu) / abs(self.sigma)
-        y = (1 / (sqrt(2 * pi) * abs(self.sigma))) * exp(-u * u / 2)
-        return y
+#### generate some arbitrary data
+mu, sigma = 3, 2
+data = np.random.normal(mu, sigma, 100)
+
+##### plot data
+plt.plot(data, np.zeros_like(data), 'x')
+
+# data driven mu and sigma
+print("Data driven mu=" , np.mean(data))
+print("Data driven sigma=", np.std(data))
+
+### x축
+x = np.linspace(start=-5, stop=8, num=1000)
+
+### uni-gaussian pdf 의 y 좌표
+uni_g = stats.norm(np.mean(data), np.std(data)).pdf(x)
+plt.plot(x,uni_g)
+plt.show()
+
+### 정상 데이터 개수
+n=0
+### 비정상 데이터 개수
+m=0
+for i in range(len(data)):
+    if (stats.norm(np.mean(data), np.std(data)).pdf(data[i])) > 0.05 and \
+            (stats.norm(np.mean(data), np.std(data)).pdf(data[i])) < 0.995:
+        n=n+1
+    else:
+        print(data[i],"= outlier")
+        m=m+1
+
+print("정상 데이터 개수:",n)
+print("비정상 데이터 개수:",m)
+
 ```
-
-코드 설명
 
 가우시안 분포는 Covariance matrix type에 따라 모양이 변합니다. 
 * Spherical type
@@ -130,7 +158,7 @@ $$% <![CDATA[
 { \sigma  }^{ 2 }=\frac { 1 }{ d } \sum _{ i=1 }^{ d }{ { \sigma  }^{ 2 } } ,\quad \sum  ={ \sigma  }^{ 2 }\left[ \begin{matrix} 1 & \cdots  & 0 \\ \vdots  & \ddots  & \vdots  \\ 0 & \cdots  & 1 \end{matrix} \right] %]]>
 $$
 
-image9
+{% include figure.html image="/images/image9.png"%}
 
 covariance matrix가 diagonal이고 동시에 x1과 x2의 각 축에서 분산이 같다고 단순하게 가정했을 때의 가우시안 분포는 위에서 봤을 때 원모양의 등고선을 보여줍니다. 
 
@@ -140,7 +168,7 @@ $$% <![CDATA[
 \sum  =\left[ \begin{matrix} { { \sigma  } }_{ 1 }^{ 2 } & \cdots  & 0 \\ \vdots  & \ddots  & \vdots  \\ 0 & \cdots  & { { \sigma  } }_{ d }^{ 2 } \end{matrix} \right] %]]>
 $$
 
-image10
+{% include figure.html image="/images/image10.png"%}
 
 covariance matrix가 diagonal이긴 하지만 축마다 분산이 다르다고 가정한 경우의 가우시안 분포는 위에서 봤을 때 축이 어그러지지 않은 타원형의 등고선을 보여줍니다.
 
@@ -150,7 +178,7 @@ $$% <![CDATA[
 \sum  =\left[ \begin{matrix} { \sigma  }_{ 11 } & \cdots  & { \sigma  }_{ 1d } \\ \vdots  & \ddots  & \vdots  \\ { \sigma  }_{ d1 } & \cdots  & { \sigma  }_{ dd } \end{matrix} \right] %]]>
 $$
 
-image11
+{% include figure.html image="/images/image11.png"%}
 
 full covariance matrix를 가질 때를 가정하면 가우시안 분포가 축도 어그러진 타원형의 등고선을 보이고 있습니다.
 
@@ -158,7 +186,7 @@ full covariance matrix를 가질 때를 가정하면 가우시안 분포가 축�
 
 위에서 본 Gaussian Density Estimation은 데이터의 분포가 가우시안 분포를 따른다는 강한 가정을 하고 있기 때문에, 복잡한 데이터의 분포의 경우는 잘 표현하지 못할 수 있습니다. 이런 이유 때문에 여러개의 가우시안 분포의 결합으로 데이터 분포를 나타내고자 하는 알고리즘이 바로 Mixture of Gaussian(혼합 가우시안) 알고리즘이라고 할 수 있습니다.
 
-image12
+{% include figure.html image="/images/image12.png"%}
 
 혼합 가우시안 분포에서 데이터가 normal일 확률은 다음과 같습니다.
 
@@ -192,10 +220,149 @@ EM 알고리즘은 이 두 과정을 계속적으로 반복해 나가면서 데�
 
 혼합 가우시안 분포도 역시 어떻게 Covariance matrix type을 가정하느냐에 따라 모양이 변합니다. 
 
-image13
+```python
+import numpy as np
+import pandas as pd
+import random as rand
+import matplotlib.pyplot as plt
+import scipy as sc
+from scipy.stats import norm
+from sys import maxsize
 
--코드 
-https://scikit-learn.org/stable/auto_examples/mixture/plot_gmm_covariances.html 참고
+class GMM:
+  def __init__(self, dataframe, parameters):
+    self.dataframe = dataframe.copy()
+    self.new_dataframe = dataframe.copy()
+    self.parameters = parameters.copy()
+    self.new_params = parameters.copy()
+
+  def p(self, val, mu, sig, lam):
+    p = lam
+    for i in range(len(val)):
+      p *= norm.pdf(val[i], mu[i], sig[i][i])
+    return p
+
+  def expectation(self):
+    for i in range(self.dataframe.shape[0]):
+      x = self.dataframe['x'][i]
+      y = self.dataframe['y'][i]
+      cluster1 = self.p([x, y], list(self.parameters['mu1']), list(self.parameters['cov1']), self.parameters['lambda'][0])
+      cluster2 = self.p([x, y], list(self.parameters['mu2']), list(self.parameters['cov2']), self.parameters['lambda'][1])
+      if cluster1 > cluster2:
+        self.new_dataframe['label'][i] = 1
+      else:
+        self.new_dataframe['label'][i] = 2
+
+  # update estimates of lambda, mu and sigma
+  def maximization(self):
+    cluster1_points = self.new_dataframe[self.new_dataframe['label'] == 1]
+    cluster2_points = self.new_dataframe[self.new_dataframe['label'] == 2]
+    percent_assigned_to_cluster1 = len(cluster1_points) / float(len(self.new_dataframe))
+    percent_assigned_to_cluster2 = 1 - percent_assigned_to_cluster1
+    self.new_params['lambda'] = [percent_assigned_to_cluster1, percent_assigned_to_cluster2]
+    self.new_params['mu1'] = [cluster1_points['x'].mean(), cluster1_points['y'].mean()]
+    self.new_params['mu2'] = [cluster2_points['x'].mean(), cluster2_points['y'].mean()]
+    self.new_params['cov1'] = [[cluster1_points['x'].std(), 0], [0, cluster1_points['y'].std()]]
+    self.new_params['cov2'] = [[cluster2_points['x'].std(), 0], [0, cluster2_points['y'].std()]]
+
+  def distance(self):
+    difference = 0
+    for param in ['mu1', 'mu2']:
+      for i in range(len(self.parameters)):
+        difference += (self.parameters[param][i] - self.new_params[param][i]) ** 2
+    return difference ** 0.5
+
+  def update(self):
+    self.dataframe = self.new_dataframe.copy()
+    self.parameters = self.new_params.copy()
+
+  def check_novelty(self):
+    for i in range(self.dataframe.shape[0]):
+      x = self.dataframe['x'][i]
+      y = self.dataframe['y'][i]
+      cluster1 = self.p([x, y], list(self.parameters['mu1']), list(self.parameters['cov1']), self.parameters['lambda'][0])
+      cluster2 = self.p([x, y], list(self.parameters['mu2']), list(self.parameters['cov2']), self.parameters['lambda'][1])
+
+      if (cluster1 + cluster2) < 0.001:
+        print(i ,'번째 샘플 :', [x, y] , 'prob :', cluster1+cluster2)
+
+
+
+
+
+#### generate 2 clusters
+### cluster 1
+mu1 = [0, 5]
+cov1 = [ [2, 0], [0, 3] ]
+num1 = 100
+
+### cluster2
+mu2 = [5, 0]
+cov2 = [ [4, 0], [0, 1] ]
+num2 = 100
+
+data1 = np.random.multivariate_normal(mu1, cov1, num1)
+x1, y1 = data1.T
+data2 = np.random.multivariate_normal(mu2, cov2, num2)
+x2, y2 = data2.T
+
+### concatenate all samples
+xs = np.concatenate((x1, x2))
+ys = np.concatenate((y1, y2))
+
+labels = ([1] * num1 + [2] * num2)
+
+data = {'x': xs, 'y': ys, 'label': labels}
+df = pd.DataFrame(data)
+
+
+# initial guesses
+guess = { 'mu1': [1,1],
+          'cov1': [ [1, 0], [0, 1] ],
+          'mu2': [4,4],
+          'cov2': [ [1, 0], [0, 1] ],
+          'lambda': [0.5, 0.5]
+        }
+params = pd.DataFrame(guess)
+
+# loop until parameters converge
+
+#### setup before iteration
+shift = maxsize
+epsilon = 0.01
+iternum = 0
+
+# randomly assign points
+df_copy = df.copy()
+df_copy['label'] = map(lambda x: x+1, np.random.choice(2, len(df)))
+
+
+gmm = GMM(df_copy.copy(), params)
+while shift > epsilon:
+  iternum += 1
+
+  # E-step
+  gmm.expectation()
+
+  # M-step
+  gmm.maximization()
+
+  # how much change
+  shift = gmm.distance()
+  print("iteration {}, shift {}".format(iternum, shift))
+
+  gmm.update()
+
+  fig = plt.figure()
+  plt.scatter(gmm.dataframe['x'], gmm.dataframe['y'], c=gmm.dataframe['label'])
+  fig.savefig("iteration{}.png".format(iternum))
+gmm.check_novelty()
+
+
+
+```
+
+{% include figure.html image="/images/image13.png"%}
 
 <h2>Kernel Density Estimation</h2>
 
@@ -222,7 +389,7 @@ R이 만약 엄청 작아지게 된다면 $P=\int _{ R }^{  }{ P({ x }^{ \prime 
 이 식에서 우리가 가져야 하는 조건은 첫번째로, R이 충분히 작아야 한다는 것과, 두번째로, 그럼에도 불구하고 N개 벡터 중 K개가 R에 들어갈 정도로는 커야한다는 것입니다. 
 이를 V를 고정시키고 k를 결정하는 문제로 본 것이 Kernel-density Estimation입니다.
 
-image14
+{% include figure.html image="/images/image14.png"%}
 
 k개의 샘플을 갖고 있는 hypercube의 영역 R이 있다고 가정해봅시다. 이 hypercube 의 한 변의 길이를 h라고 하고, 이 hypercube의 정 중앙을 x라고 합시다. 이 때, 차원이 d라면 이 영역의 부피는 ${ V }_{ n }={ h }_{ n }^{ d }$ 입니다. 
 
@@ -251,9 +418,7 @@ $$
 
 또한 h값에 따라 추정하느 분포의 모양이 달라지는데요, h가 큰 값일 경우 완만한 분포가 추정되고, h가 작은 값일 경우에는 뾰족뾰족한 분포가 됩니다.
 
-image15
-
--코드-
+{% include figure.html image="/images/image15.png"%}
 
 <h2>Local Oultlier Factors</h2>
 
@@ -267,7 +432,7 @@ $${ reachability-distance }_{ k }(p,o)=max\left\{ k-distance(o),dist(p,o) \right
 
 reachability distance는 단순하게 말하자면, k-distance 범위 안에 있는 데이터까지의 거리는 p와 o 사이의 거리와 k-distance 중 큰 값을 사용하자는 것입니다. 
 
-image16
+{% include figure.html image="/images/image16.png"%}
 
 위에서 보면 A에서 C까지의 거리를 rechability distance로 바꾸어서 거리를 계산하게 되면 3-distance(A)와 같아집니다.
 D의 경우는 rechability distance보다 멀리 있기 때문에 그대로 거리값을 사용하게 됩니다.
@@ -287,12 +452,117 @@ $${ LOF }_{ k }(p)=\frac { \sum _{ o\in { N }_{ k }(p) }^{  }{ \frac { lrd_{ k }
 
 LOF 점수는 위의 식처럼 구할 수 있습니다. 여기서 LOF의 점수는 p가 얼마나 이상치인지를 나타내주는 점수라고 할 수 있습니다.
 
-Image17
+{% include figure.html image="/images/image17.png"%}
 
 위 그림에서 파란색 점이 p이고 초록색 점이 q라고 합시다.
 LOF(p) 값이 크려면 ‘초록색 점들이 밀도가 높은 와중에 파란색 점은 밀도가 낮아야’ 합니다.
 지금 Case 2번의 경우만 이런 조건을 만족시키기 때문에 LOF(p)가 높고, 나머지 케이스들은 LOF(p)가 낮습니다.
 
 즉, 단순히 파란색 점 주변의 상대적 밀도뿐만 아니라 초록색 점 주변의 상대적 밀도들도 같이 고려해주는 알고리즘입니다.
+
+```python
+import numpy as np
+import scipy.spatial as sc
+import pandas as pd
+import random
+
+class LOF:
+    def __init__(self, data, nkp):
+        self.nkp = nkp
+        self.data = data
+        self.index = len(data)
+        self.dist_list = []
+        self.k_dist_list = []
+        self.points_in_circle_list = []
+        self.lrd_list = []
+
+    def k_dist(self):
+        df = pd.DataFrame(self.data, columns=['X', 'Y'], index=range(self.index))
+        distance = pd.DataFrame(sc.distance_matrix(df.values, df.values),
+                                       index=df.index, columns=df.index)
+
+        dist_list = []
+        k_dist_list = []
+        for i in range(0, self.index):
+
+            dist = np.array(distance[i])
+            dist = np.delete(dist, [i])
+            self.dist_list.append(dist)
+
+            sorted_dist = np.array(distance[i])
+            sorted_dist = np.delete(sorted_dist, [i])
+            sorted_dist.sort()
+
+            k_distance = sorted_dist[self.nkp - 1]
+            self.k_dist_list.append(k_distance)
+
+        return
+
+    def reachability_dist(self):
+
+        points_in_circle_list = []
+        for i in range(0, self.index):
+
+            points_in_circle = np.where(self.dist_list[i] <= self.k_dist_list[i])
+            self.points_in_circle_list.append(points_in_circle)
+            points_in_circle_ints = points_in_circle[0]
+
+            for j in points_in_circle_ints:
+                self.dist_list[i][j] = self.k_dist_list[i]
+
+        return
+
+
+    def lrd(self):
+
+        for i in range(0, self.index):
+            lrd_p = (self.nkp) / sum(self.dist_list[i][self.points_in_circle_list[i][0]])
+            self.lrd_list.append(lrd_p)
+
+        return
+
+    def LOF_score(self):
+        a = 0
+        lrd_neighbors=[]
+        LOFscore = []
+
+        for i in range(self.index):
+            points_in_circle = self.points_in_circle_list[i]
+            for j in range(len(points_in_circle[0])):
+                points_in_circle_ints = points_in_circle[0]
+                a = a + self.lrd_list[points_in_circle_ints[j]]
+            lrd_neighbors.append(a)
+            a = 0
+
+        for i in range(0, self.index):
+            lof = (lrd_neighbors[i] / self.lrd_list[i]) / self.nkp
+            LOFscore.append(lof)
+
+        print(LOFscore)
+        return LOFscore
+
+#Data Generation
+
+num_samples = 10
+
+mu_x, sigma_x = 3, 2
+data_x = np.random.normal(mu_x, sigma_x, num_samples)
+
+mu_y, sigma_y = 1, 5
+data_y = np.random.normal(mu_y, sigma_y, num_samples)
+
+data = [[x, y] for (x, y) in zip(data_x, data_y)]
+idx = range(num_samples)
+
+# print(len(data))
+df = pd.DataFrame(data, columns=['X', 'Y'], index=idx)
+
+lof=LOF(data=data, nkp=3)
+lof.k_dist()
+lof.reachability_dist()
+lof.lrd()
+lofscore = lof.LOF_score()
+
+```
 
 
