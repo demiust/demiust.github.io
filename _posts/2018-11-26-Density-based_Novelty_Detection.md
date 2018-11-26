@@ -202,7 +202,11 @@ $$\lambda =\left\{ { w }_{ m },{ \mu  }_{ m },{ \sum   }_{ m } \right\} ,m=1,\cd
  
 <h3>Expectation-Maximization Algorithm</h3>
 
-혼합 가우시안 모델을 쓰기 위해서는 Expectation-Maximization Algorithm을 사용해야 합니다. 이 때, Expectation은 ${ w }_{ m }$, ${ \mu  }_{ m }$, ${ \Sigma  }_{ m }$ 를 고정시킨 상태에서 m을 찾는 과정입니다. 이 때, m은 개별 개체가 몇 번 분포에 얼마만큼 들어갈 확률인지를 말합니다.
+혼합 가우시안 모델을 쓰기 위해서는 Expectation-Maximization Algorithm을 사용해야 합니다. 이 때, Expectation은 
+${ w }_{ m }$ , 
+${ \mu  }_{ m }$ , 
+${ \Sigma  }_{ m }$
+를 고정시킨 상태에서 m을 찾는 과정입니다. 이 때, m은 개별 개체가 몇 번 분포에 얼마만큼 들어갈 확률인지를 말합니다.
 
 $$ p(m|{ x }_{ i },\lambda )=\frac { { w }_{ m }g({ x }_{ t }|{ \mu  }_{ m },{ m }_{ m }) }{ \sum _{ k=1 }^{ M }{ { w }_{ k }g({ x }_{ i }|{ \mu  }_{ k },{ m }_{ k }) }  }
 $$
@@ -391,7 +395,7 @@ R이 만약 엄청 작아지게 된다면 $P=\int _{ R }^{  }{ P({ x }^{ \prime 
 
 {% include figure.html image="/images/image14.png"%}
 
-k개의 샘플을 갖고 있는 hypercube의 영역 R이 있다고 가정해봅시다. 이 hypercube 의 한 변의 길이를 h라고 하고, 이 hypercube의 정 중앙을 x라고 합시다. 이 때, 차원이 d라면 이 영역의 부피는 ${ V }_{ n }={ h }_{ n }^{ d }$ 입니다. 
+k개의 샘플을 갖고 있는 hypercube의 영역 R이 있다고 가정해봅시다. 이 hypercube 의 한 변의 길이를 h라고 하고, 이 hypercube의 정 중앙을 x라고 합시다. 이 때, 차원이 d라면 이 영역의 부피는 ${ h }_{ n }^{ d }$ 입니다. 
 
 만약 이 큐브 안에 샘플 개수를 세는 식을 만든다면, 밑 식과 같습니다.
 
@@ -443,7 +447,8 @@ $$lrd_{ k }(A)=\frac { |{ N }_{ k }(p)| }{ \sum _{ O\in { N }_{ k }(p) } reachab
 
 분자는 k-distance 안의 개체 수이고, 분모는 p에서 다른 오브젝트까지의 reachability distance입니다. 
 
-p가 밀도가 높은 부분에 위치한다면 분모는 작아지게 되고, 그러면 ${lrd}_{k}(p)$ 값은 커집니다.
+p가 밀도가 높은 부분에 위치한다면 분모는 작아지게 되고, 그러면 ${lrd}_{k}(p)$ 값은 커집니다. <br>
+
 반대로 p가 밀도가 낮은 부분에 위치한다면 분모는 커지고, 그러면 ${lrd}_{k}(p)$ 값은 작아집니다.
 
 <h3>Local outlier factor</h3>
