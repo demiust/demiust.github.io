@@ -109,6 +109,39 @@ $$
 
 위의 식을 통해서 우리가 가진 데이터의 평균과 분산이 정규분포의 평균과 분산과 같아지는 것을 확인할 수 있었습니다.
 
+가우시안 분포는 Covariance matrix type에 따라 모양이 변합니다. 
+* Spherical type
+
+$$% <![CDATA[
+{ \sigma  }^{ 2 }=\frac { 1 }{ d } \sum _{ i=1 }^{ d }{ { \sigma  }^{ 2 } } ,\quad \sum  ={ \sigma  }^{ 2 }\left[ \begin{matrix} 1 & \cdots  & 0 \\ \vdots  & \ddots  & \vdots  \\ 0 & \cdots  & 1 \end{matrix} \right] %]]>
+$$
+
+{% include figure.html image="/images/image9.png"%}
+
+covariance matrix가 diagonal이고 동시에 x1과 x2의 각 축에서 분산이 같다고 단순하게 가정했을 때의 가우시안 분포는 위에서 봤을 때 원모양의 등고선을 보여줍니다. 
+
+* Diagonal type
+
+$$% <![CDATA[
+\sum  =\left[ \begin{matrix} { { \sigma  } }_{ 1 }^{ 2 } & \cdots  & 0 \\ \vdots  & \ddots  & \vdots  \\ 0 & \cdots  & { { \sigma  } }_{ d }^{ 2 } \end{matrix} \right] %]]>
+$$
+
+{% include figure.html image="/images/image10.png"%}
+
+covariance matrix가 diagonal이긴 하지만 축마다 분산이 다르다고 가정한 경우의 가우시안 분포는 위에서 봤을 때 축이 어그러지지 않은 타원형의 등고선을 보여줍니다.
+
+* Full type
+
+$$% <![CDATA[
+\sum  =\left[ \begin{matrix} { \sigma  }_{ 11 } & \cdots  & { \sigma  }_{ 1d } \\ \vdots  & \ddots  & \vdots  \\ { \sigma  }_{ d1 } & \cdots  & { \sigma  }_{ dd } \end{matrix} \right] %]]>
+$$
+
+{% include figure.html image="/images/image11.png"%}
+
+full covariance matrix를 가질 때를 가정하면 가우시안 분포가 축도 어그러진 타원형의 등고선을 보이고 있습니다.
+
+아래는 가우시안 밀도 추정을 코드로 구현한 예시입니다.
+
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
@@ -151,37 +184,6 @@ print("비정상 데이터 개수:",m)
 
 ```
 
-가우시안 분포는 Covariance matrix type에 따라 모양이 변합니다. 
-* Spherical type
-
-$$% <![CDATA[
-{ \sigma  }^{ 2 }=\frac { 1 }{ d } \sum _{ i=1 }^{ d }{ { \sigma  }^{ 2 } } ,\quad \sum  ={ \sigma  }^{ 2 }\left[ \begin{matrix} 1 & \cdots  & 0 \\ \vdots  & \ddots  & \vdots  \\ 0 & \cdots  & 1 \end{matrix} \right] %]]>
-$$
-
-{% include figure.html image="/images/image9.png"%}
-
-covariance matrix가 diagonal이고 동시에 x1과 x2의 각 축에서 분산이 같다고 단순하게 가정했을 때의 가우시안 분포는 위에서 봤을 때 원모양의 등고선을 보여줍니다. 
-
-* Diagonal type
-
-$$% <![CDATA[
-\sum  =\left[ \begin{matrix} { { \sigma  } }_{ 1 }^{ 2 } & \cdots  & 0 \\ \vdots  & \ddots  & \vdots  \\ 0 & \cdots  & { { \sigma  } }_{ d }^{ 2 } \end{matrix} \right] %]]>
-$$
-
-{% include figure.html image="/images/image10.png"%}
-
-covariance matrix가 diagonal이긴 하지만 축마다 분산이 다르다고 가정한 경우의 가우시안 분포는 위에서 봤을 때 축이 어그러지지 않은 타원형의 등고선을 보여줍니다.
-
-* Full type
-
-$$% <![CDATA[
-\sum  =\left[ \begin{matrix} { \sigma  }_{ 11 } & \cdots  & { \sigma  }_{ 1d } \\ \vdots  & \ddots  & \vdots  \\ { \sigma  }_{ d1 } & \cdots  & { \sigma  }_{ dd } \end{matrix} \right] %]]>
-$$
-
-{% include figure.html image="/images/image11.png"%}
-
-full covariance matrix를 가질 때를 가정하면 가우시안 분포가 축도 어그러진 타원형의 등고선을 보이고 있습니다.
-
 <h2> Mixture of Gaussian </h2>
 
 위에서 본 Gaussian Density Estimation은 데이터의 분포가 가우시안 분포를 따른다는 강한 가정을 하고 있기 때문에, 복잡한 데이터의 분포의 경우는 잘 표현하지 못할 수 있습니다. 이런 이유 때문에 여러개의 가우시안 분포의 결합으로 데이터 분포를 나타내고자 하는 알고리즘이 바로 Mixture of Gaussian(혼합 가우시안) 알고리즘이라고 할 수 있습니다.
@@ -223,6 +225,10 @@ $$
 EM 알고리즘은 이 두 과정을 계속적으로 반복해 나가면서 데이터의 분포를 추정하고자 합니다.
 
 혼합 가우시안 분포도 역시 어떻게 Covariance matrix type을 가정하느냐에 따라 모양이 변합니다. 
+
+{% include figure.html image="/images/image13.png"%}
+
+아래는 혼합 가우시안 분포를 통해 novelty detection을 하는 코드의 예제입니다.
 
 ```python
 import numpy as np
@@ -289,10 +295,6 @@ class GMM:
 
       if (cluster1 + cluster2) < 0.001:
         print(i ,'번째 샘플 :', [x, y] , 'prob :', cluster1+cluster2)
-
-
-
-
 
 #### generate 2 clusters
 ### cluster 1
@@ -365,8 +367,6 @@ gmm.check_novelty()
 
 
 ```
-
-{% include figure.html image="/images/image13.png"%}
 
 <h2>Kernel Density Estimation</h2>
 
@@ -465,6 +465,7 @@ LOF(p) 값이 크려면 ‘초록색 점들이 밀도가 높은 와중에 파란
 
 즉, 단순히 파란색 점 주변의 상대적 밀도뿐만 아니라 초록색 점 주변의 상대적 밀도들도 같이 고려해주는 알고리즘입니다.
 
+아래는 novelty detection을 하기 위해 LOF 점수를 계산하는 코드의 예제입니다.
 ```python
 import numpy as np
 import scipy.spatial as sc
